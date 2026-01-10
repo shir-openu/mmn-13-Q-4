@@ -51,84 +51,89 @@ async function handleAIRequest(body) {
   }
 
   const prompt = `
-# HIGHEST PRIORITY INSTRUCTIONS
-1. NEVER give the complete final answer until ${MAX_ATTEMPTS} attempts are exhausted
-2. NEVER repeat the same hint twice - check conversation history
-3. Be helpful but guide, don't solve
-4. Respond in HEBREW by default
-5. Keep responses SHORT (2-4 sentences max)
-6. Use gender-neutral language (plural forms)
+# CRITICAL INSTRUCTIONS
+1. Respond in HEBREW only
+2. Be PRACTICAL and SPECIFIC - give concrete mathematical guidance
+3. Keep responses 2-4 sentences
+4. Use gender-neutral language (plural forms)
+5. NEVER give the complete final answer until ${MAX_ATTEMPTS} attempts exhausted
+6. NEVER repeat the same hint - check conversation history and progress
 
 ---
 
-# Exercise Context: Substitution Method for Triangular ODE System
+# The Exercise: Triangular ODE System - Substitution Method
 
-## The Problem
-Students are solving this system of differential equations:
-\`\`\`
+## The System:
 dx/dt = 5x + 2y
-dy/dt = 5y + e^{5t}
+dy/dt = 5y + e^{5t}  ← Start here (depends only on y)
 dz/dt = 3y + 5z
-\`\`\`
 
-This is a **triangular system** - the second equation depends only on y, so we solve it first, then substitute into the others.
+## COMPLETE SOLUTIONS (your reference):
 
-## Complete Solution (FOR YOUR REFERENCE ONLY - don't reveal entirely)
-
-### Step 1: Solve for y(t)
-Equation: y' - 5y = e^{5t}
-- Integrating factor: e^{-5t}
-- Multiply: (e^{-5t}y)' = 1
+**Step 1 - Solve y(t):**
+- Equation: y' - 5y = e^{5t} (first-order linear)
+- Integrating factor: μ = e^{-5t}
+- Multiply both sides: e^{-5t}y' - 5e^{-5t}y = 1
+- Left side is derivative: (e^{-5t}y)' = 1
 - Integrate: e^{-5t}y = t + B
-- **Solution: y(t) = te^{5t} + Be^{5t}**
+- ANSWER: y(t) = te^{5t} + Be^{5t} = (t+B)e^{5t}
 
-### Step 2: Solve for x(t)
-Substitute y into first equation: x' - 5x = 2te^{5t} + 2Be^{5t}
-- Integrating factor: e^{-5t}
+**Step 2 - Solve x(t):**
+- Substitute y: x' - 5x = 2y = 2te^{5t} + 2Be^{5t}
+- Integrating factor: μ = e^{-5t}
 - (e^{-5t}x)' = 2t + 2B
 - Integrate: e^{-5t}x = t² + 2Bt + A
-- **Solution: x(t) = t²e^{5t} + 2Bte^{5t} + Ae^{5t}**
+- ANSWER: x(t) = t²e^{5t} + 2Bte^{5t} + Ae^{5t}
 
-### Step 3: Solve for z(t)
-Substitute y into third equation: z' - 5z = 3te^{5t} + 3Be^{5t}
-- Integrating factor: e^{-5t}
+**Step 3 - Solve z(t):**
+- Substitute y: z' - 5z = 3y = 3te^{5t} + 3Be^{5t}
+- Integrating factor: μ = e^{-5t}
 - (e^{-5t}z)' = 3t + 3B
 - Integrate: e^{-5t}z = (3/2)t² + 3Bt + C
-- **Solution: z(t) = (3/2)t²e^{5t} + 3Bte^{5t} + Ce^{5t}**
+- ANSWER: z(t) = (3/2)t²e^{5t} + 3Bte^{5t} + Ce^{5t}
 
 ---
 
 ## Current Step: ${currentStep}
+## Expected Answer: ${problemData.correctAnswer}
+## Student Input: ${userInput}
 
-## Correct Answer for This Step:
-${problemData.correctAnswer}
-
-## Student's Current Input:
-${userInput}
+${conversationText ? `## Previous Conversation:\n${conversationText}` : ''}
 
 ---
 
-${conversationText ? `## Conversation History:\n${conversationText}\n---\n\n` : ''}
+# SPECIFIC HINTS BY STEP (give progressively):
 
-## Your Task
-1. Compare the student's input to the correct answer for step ${currentStep}
-2. If correct: Confirm briefly and encourage moving to next step
-3. If incorrect:
-   - Identify what's wrong (missing term, wrong coefficient, sign error, etc.)
-   - Give a SHORT, TARGETED hint
-   - Don't reveal the answer directly
-4. If student seems stuck (3+ attempts on same step): Give more explicit guidance
+## If Step 1 (solving y):
+- Hint 1: "המשוואה y' - 5y = e^{5t} היא מד״ר מסדר ראשון לינארית. השתמשו בשיטת הגורם האינטגרלי."
+- Hint 2: "הגורם האינטגרלי הוא μ = e^{-5t}. הכפילו את שני האגפים בגורם זה."
+- Hint 3: "לאחר ההכפלה, האגף השמאלי הופך לנגזרת: (e^{-5t}·y)' = 1"
+- Hint 4: "אינטגרו את שני האגפים: e^{-5t}·y = t + B. כעת בודדו את y."
 
-## Hint Progression for Step ${currentStep}:
-- First hint: Point to the method (integrating factor)
-- Second hint: Mention the specific integrating factor e^{-5t}
-- Third hint: Show the derivative form (e^{-5t}y)' = ...
-- Fourth hint: Show the integration result before solving
+## If Step 2 (solving x):
+- Hint 1: "הציבו את y שמצאתם במשוואה הראשונה. תקבלו: x' - 5x = 2y = 2(t+B)e^{5t}"
+- Hint 2: "זו שוב מד״ר לינארית עם אותו גורם אינטגרלי: μ = e^{-5t}"
+- Hint 3: "לאחר הכפלה: (e^{-5t}·x)' = 2t + 2B"
+- Hint 4: "אינטגרו: e^{-5t}·x = t² + 2Bt + A. בודדו את x."
 
-## Response Format
-- Hebrew, short (2-4 sentences)
-- No greetings or pleasantries
-- Focus on the mathematical content
+## If Step 3 (solving z):
+- Hint 1: "הציבו את y במשוואה השלישית. תקבלו: z' - 5z = 3y = 3(t+B)e^{5t}"
+- Hint 2: "שוב, הגורם האינטגרלי הוא μ = e^{-5t}"
+- Hint 3: "לאחר הכפלה: (e^{-5t}·z)' = 3t + 3B"
+- Hint 4: "אינטגרו: e^{-5t}·z = (3/2)t² + 3Bt + C. בודדו את z."
+
+# COMMON ERRORS TO CHECK:
+- Missing the constant of integration (B, A, or C)
+- Wrong coefficient (should be 2 for x, 3 for z)
+- Missing e^{5t} factor
+- Wrong sign
+- Forgot to substitute y correctly
+
+# YOUR RESPONSE:
+1. If CORRECT: "נכון! [brief confirmation]" and encourage next step
+2. If INCORRECT: Identify the specific error and give the appropriate hint from above
+3. If student asks for help/hint: Give the next hint in progression
+4. After 3+ attempts: Give more explicit guidance, show intermediate steps
 `;
 
   const result = await model.generateContent(prompt);
