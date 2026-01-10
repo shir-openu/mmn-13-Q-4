@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>פתרון מערכת משוואות דיפרנציאליות - שיטת החילוץ</title>
+    <style>
+        :root {
+            --bg: #0b1220;
+            --card-bg: #141d2b;
+            --border: #2d3a4f;
+            --ink: #e5e7eb;
+            --teal: #11a8a0;
+            --magenta: #f472b6;
+            --purple: #a78bfa;
+            --green: #22c55e;
+            --orange: #f59e0b;
+            --red: #ef4444;
+            --calc-bg: #0c1526;
+            --blue: #3b82f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+            min-height: 100vh;
+            padding: 20px;
+            font-size: 1rem;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: var(--teal);
+            font-size: 1.8rem;
+            font-weight: 400;
+        }
+
+        .subtitle {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--ink);
+            opacity: 0.7;
+            font-size: 1rem;
+        }
+
+        .problem-statement {
+            text-align: center;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: var(--card-bg);
+            border: 2px solid var(--teal);
+            border-radius: 16px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .problem-statement h2 {
+            color: var(--teal);
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            font-weight: 400;
+        }
+
+        .problem-math {
+            font-family: 'Times New Roman', serif;
+            font-size: 1.3rem;
+            direction: ltr;
+            line-height: 2.2;
+        }
+
+        .equation-system {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .equation-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .system-brace {
+            font-size: 4rem;
+            font-weight: 100;
+            line-height: 1;
+            margin-left: 10px;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        .phase {
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            opacity: 0.4;
+            transition: opacity 0.5s ease;
+        }
+
+        .phase.active {
+            opacity: 1;
+        }
+
+        .phase.step1 {
+            border-color: var(--purple);
+        }
+
+        .phase.step2 {
+            border-color: var(--orange);
+        }
+
+        .phase.step3 {
+            border-color: var(--green);
+        }
+
+        .phase-title {
+            text-align: center;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            font-weight: 400;
+        }
+
+        .phase.step1 .phase-title {
+            color: var(--purple);
+        }
+
+        .phase.step2 .phase-title {
+            color: var(--orange);
+        }
+
+        .phase.step3 .phase-title {
+            color: var(--green);
+        }
+
+        .phase-description {
+            text-align: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .guiding-question {
+            background: rgba(167, 139, 250, 0.1);
+            border: 1px solid var(--purple);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .guiding-question h3 {
+            color: var(--purple);
+            font-size: 1rem;
+            font-weight: 400;
+            margin-bottom: 10px;
+        }
+
+        .guiding-question p {
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .guiding-question .math {
+            font-family: 'Times New Roman', serif;
+            font-size: 1.1rem;
+            direction: ltr;
+            margin: 10px 0;
+        }
+
+        /* Input styles */
+        .input-section {
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .input-section label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+
+        .input-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            direction: ltr;
+            font-family: 'Times New Roman', serif;
+            font-size: 1.1rem;
+            margin: 10px 0;
+        }
+
+        .input-row input {
+            width: 100px;
+            height: 38px;
+            text-align: center;
+            font-size: 1rem;
+            font-family: 'Times New Roman', serif;
+            background: var(--calc-bg);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            color: var(--ink);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .input-row input:focus {
+            border-color: var(--teal);
+        }
+
+        .input-row input.correct {
+            border-color: var(--green);
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        .input-row input.incorrect {
+            border-color: var(--red);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .input-row input.wide {
+            width: 150px;
+        }
+
+        /* Buttons */
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            padding: 10px 20px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            background: var(--calc-bg);
+            color: var(--ink);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .control-btn:hover {
+            border-color: var(--teal);
+            background: rgba(17, 168, 160, 0.2);
+        }
+
+        .control-btn.primary {
+            border-color: var(--green);
+            background: rgba(34, 197, 94, 0.2);
+        }
+
+        .control-btn.primary:hover {
+            background: rgba(34, 197, 94, 0.4);
+        }
+
+        .control-btn.show-solution {
+            border-color: var(--orange);
+            background: rgba(245, 158, 11, 0.2);
+        }
+
+        .control-btn.show-solution:hover {
+            background: rgba(245, 158, 11, 0.4);
+        }
+
+        .control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Solution display */
+        .solution-box {
+            background: var(--calc-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            direction: ltr;
+            font-family: 'Times New Roman', serif;
+            line-height: 1.8;
+            display: none;
+        }
+
+        .solution-box.visible {
+            display: block;
+        }
+
+        .solution-box h4 {
+            color: var(--teal);
+            font-weight: 400;
+            margin-bottom: 10px;
+            text-align: center;
+            direction: rtl;
+        }
+
+        .solution-step {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+        }
+
+        .solution-step .label {
+            color: var(--purple);
+            font-size: 1rem;
+            margin-bottom: 5px;
+            direction: rtl;
+            text-align: right;
+        }
+
+        .solution-step .math {
+            font-size: 1.05rem;
+            text-align: center;
+        }
+
+        /* Result highlight */
+        .result-highlight {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid var(--green);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .result-highlight h4 {
+            color: var(--green);
+            margin-bottom: 10px;
+            font-weight: 400;
+        }
+
+        .result-highlight .math {
+            font-family: 'Times New Roman', serif;
+            font-size: 1.15rem;
+            direction: ltr;
+        }
+
+        /* Feedback messages */
+        .feedback {
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            display: none;
+        }
+
+        .feedback.visible {
+            display: block;
+        }
+
+        .feedback.success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid var(--green);
+            color: var(--green);
+        }
+
+        .feedback.error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--red);
+            color: var(--red);
+        }
+
+        /* Highlight colors */
+        .hl-teal { color: var(--teal); font-weight: 500; }
+        .hl-magenta { color: var(--magenta); font-weight: 500; }
+        .hl-blue { color: var(--blue); font-weight: 500; }
+        .hl-purple { color: var(--purple); font-weight: 500; }
+        .hl-green { color: var(--green); font-weight: 500; }
+        .hl-orange { color: var(--orange); font-weight: 500; }
+
+        /* Navigation buttons */
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .nav-btn {
+            padding: 12px 30px;
+            border: 2px solid var(--teal);
+            border-radius: 10px;
+            background: rgba(17, 168, 160, 0.2);
+            color: var(--ink);
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: rgba(17, 168, 160, 0.4);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* Progress indicator */
+        .progress-bar {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .progress-step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            color: var(--ink);
+            opacity: 0.5;
+            transition: all 0.3s;
+        }
+
+        .progress-step.active {
+            opacity: 1;
+            border-color: var(--teal);
+            background: rgba(17, 168, 160, 0.2);
+        }
+
+        .progress-step.completed {
+            opacity: 1;
+            border-color: var(--green);
+            background: rgba(34, 197, 94, 0.3);
+            color: var(--green);
+        }
+
+        .progress-connector {
+            width: 50px;
+            height: 2px;
+            background: var(--border);
+            align-self: center;
+        }
+
+        .progress-connector.completed {
+            background: var(--green);
+        }
+
+        /* Method explanation box */
+        .method-box {
+            background: rgba(167, 139, 250, 0.1);
+            border: 1px solid var(--purple);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .method-box h3 {
+            color: var(--purple);
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            text-align: center;
+            font-weight: 400;
+        }
+
+        .method-box p {
+            font-size: 1rem;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        @media (max-width: 1400px) {
+            .container {
+                grid-template-columns: 1fr 1fr;
+            }
+            .phase.step3 {
+                grid-column: span 2;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            .phase.step3 {
+                grid-column: span 1;
+            }
+        }
+
+        /* Footer */
+        .site-footer {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            font-size: 13px;
+            color: var(--ink);
+            opacity: 0.7;
+        }
+
+        /* Equation highlight */
+        .eq-highlight {
+            background: rgba(17, 168, 160, 0.15);
+            padding: 2px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <h1>פתרון מערכת משוואות דיפרנציאליות</h1>
+    <div class="subtitle">שיטת החילוץ (Substitution)</div>
+
+    <!-- Problem Statement -->
+    <div class="problem-statement">
+        <h2>השאלה</h2>
+        <div class="problem-math">
+            <div class="equation-system">
+                <div class="equation-row">
+                    <span>dx/dt = 5x + 2y</span>
+                </div>
+                <div class="equation-row">
+                    <span>dy/dt = 5y + e<sup>5t</sup></span>
+                </div>
+                <div class="equation-row">
+                    <span>dz/dt = 3y + 5z</span>
+                </div>
+            </div>
+        </div>
+        <p style="margin-top: 15px; font-size: 1rem; opacity: 0.8;">מצאו את הפתרון הכללי של המערכת</p>
+    </div>
+
+    <!-- Method explanation -->
+    <div class="method-box">
+        <h3>שיטת החילוץ</h3>
+        <p>
+            זוהי מערכת משולשית - המשוואה השנייה תלויה רק ב-y,
+            לכן נפתור אותה קודם, ואז נציב בשאר המשוואות.
+        </p>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar">
+        <div class="progress-step active" id="prog1">1</div>
+        <div class="progress-connector" id="conn1"></div>
+        <div class="progress-step" id="prog2">2</div>
+        <div class="progress-connector" id="conn2"></div>
+        <div class="progress-step" id="prog3">3</div>
+    </div>
+
+    <div class="container">
+        <!-- Step 1: Solve for y(t) -->
+        <div class="phase step1 active" id="phase1">
+            <div class="phase-title">שלב 1: פתרון y(t)</div>
+
+            <div class="phase-description">
+                המשוואה השנייה היא משוואה לינארית מסדר ראשון ב-y בלבד
+            </div>
+
+            <div class="guiding-question">
+                <h3>שאלה מנחה</h3>
+                <p>פתרו את המשוואה:</p>
+                <div class="math">
+                    <span class="eq-highlight">y' − 5y = e<sup>5t</sup></span>
+                </div>
+                <p style="margin-top: 10px; font-size: 1rem;">רמז: השתמשו בגורם אינטגרציה e<sup>−5t</sup></p>
+            </div>
+
+            <div class="input-section">
+                <label>מהו הפתרון הכללי של y(t)?</label>
+                <div class="input-row">
+                    <span>y(t) =</span>
+                    <input type="text" id="y-coef1" placeholder="?" class="wide">
+                    <span>· e<sup>5t</sup> +</span>
+                    <input type="text" id="y-coef2" placeholder="?">
+                    <span>· e<sup>5t</sup></span>
+                </div>
+                <p style="font-size: 1rem; opacity: 0.7; margin-top: 5px;">הזינו: t עבור פונקציה של t, או B עבור קבוע</p>
+            </div>
+
+            <div class="feedback" id="feedback1"></div>
+
+            <div class="controls">
+                <button class="control-btn primary" id="check1">בדקו תשובה</button>
+                <button class="control-btn show-solution" id="show1">הציגו פתרון</button>
+            </div>
+
+            <div class="solution-box" id="solution1">
+                <h4>פתרון שלב 1</h4>
+                <div class="solution-step">
+                    <div class="label">המשוואה:</div>
+                    <div class="math">y' − 5y = e<sup>5t</sup></div>
+                </div>
+                <div class="solution-step">
+                    <div class="label">כפל בגורם אינטגרציה e<sup>−5t</sup>:</div>
+                    <div class="math">
+                        e<sup>−5t</sup>y' − 5e<sup>−5t</sup>y = 1
+                    </div>
+                </div>
+                <div class="solution-step">
+                    <div class="label">צד שמאל הוא נגזרת של מכפלה:</div>
+                    <div class="math">
+                        (e<sup>−5t</sup>y)' = 1
+                    </div>
+                </div>
+                <div class="solution-step">
+                    <div class="label">אינטגרציה:</div>
+                    <div class="math">
+                        e<sup>−5t</sup>y = t + B
+                    </div>
+                </div>
+                <div class="result-highlight">
+                    <h4>הפתרון</h4>
+                    <div class="math">
+                        <span class="hl-purple">y(t) = te<sup>5t</sup> + Be<sup>5t</sup></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Solve for x(t) -->
+        <div class="phase step2" id="phase2">
+            <div class="phase-title">שלב 2: פתרון x(t)</div>
+
+            <div class="phase-description">
+                נציב את y(t) במשוואה הראשונה ונפתור עבור x
+            </div>
+
+            <div class="guiding-question">
+                <h3>שאלה מנחה</h3>
+                <p>הציבו y(t) = te<sup>5t</sup> + Be<sup>5t</sup> במשוואה:</p>
+                <div class="math">
+                    <span class="eq-highlight">x' − 5x = 2te<sup>5t</sup> + 2Be<sup>5t</sup></span>
+                </div>
+                <p style="margin-top: 10px; font-size: 1rem;">רמז: שוב השתמשו בגורם אינטגרציה e<sup>−5t</sup></p>
+            </div>
+
+            <div class="input-section">
+                <label>מהו הפתרון הכללי של x(t)?</label>
+                <div class="input-row">
+                    <span>x(t) =</span>
+                    <input type="text" id="x-coef1" placeholder="?" class="wide">
+                    <span>· e<sup>5t</sup> +</span>
+                    <input type="text" id="x-coef2" placeholder="?" class="wide">
+                    <span>· e<sup>5t</sup> +</span>
+                    <input type="text" id="x-coef3" placeholder="?">
+                    <span>· e<sup>5t</sup></span>
+                </div>
+                <p style="font-size: 1rem; opacity: 0.7; margin-top: 5px;">הזינו: t^2 עבור t², 2Bt עבור 2Bt, A עבור קבוע</p>
+            </div>
+
+            <div class="feedback" id="feedback2"></div>
+
+            <div class="controls">
+                <button class="control-btn primary" id="check2" disabled>בדקו תשובה</button>
+                <button class="control-btn show-solution" id="show2" disabled>הציגו פתרון</button>
+            </div>
+
+            <div class="solution-box" id="solution2">
+                <h4>פתרון שלב 2</h4>
+                <div class="solution-step">
+                    <div class="label">המשוואה אחרי הצבה:</div>
+                    <div class="math">x' − 5x = 2te<sup>5t</sup> + 2Be<sup>5t</sup></div>
+                </div>
+                <div class="solution-step">
+                    <div class="label">כפל בגורם אינטגרציה e<sup>−5t</sup>:</div>
+                    <div class="math">
+                        (e<sup>−5t</sup>x)' = 2t + 2B
+                    </div>
+                </div>
+                <div class="solution-step">
+                    <div class="label">אינטגרציה:</div>
+                    <div class="math">
+                        e<sup>−5t</sup>x = t² + 2Bt + A
+                    </div>
+                </div>
+                <div class="result-highlight">
+                    <h4>הפתרון</h4>
+                    <div class="math">
+                        <span class="hl-orange">x(t) = t²e<sup>5t</sup> + 2Bte<sup>5t</sup> + Ae<sup>5t</sup></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Solve for z(t) -->
+        <div class="phase step3" id="phase3">
+            <div class="phase-title">שלב 3: פתרון z(t)</div>
+
+            <div class="phase-description">
+                נציב את y(t) במשוואה השלישית ונפתור עבור z
+            </div>
+
+            <div class="guiding-question">
+                <h3>שאלה מנחה</h3>
+                <p>הציבו y(t) = te<sup>5t</sup> + Be<sup>5t</sup> במשוואה:</p>
+                <div class="math">
+                    <span class="eq-highlight">z' − 5z = 3te<sup>5t</sup> + 3Be<sup>5t</sup></span>
+                </div>
+            </div>
+
+            <div class="input-section">
+                <label>מהו הפתרון הכללי של z(t)?</label>
+                <div class="input-row">
+                    <span>z(t) =</span>
+                    <input type="text" id="z-coef1" placeholder="?" class="wide">
+                    <span>· e<sup>5t</sup> +</span>
+                    <input type="text" id="z-coef2" placeholder="?" class="wide">
+                    <span>· e<sup>5t</sup> +</span>
+                    <input type="text" id="z-coef3" placeholder="?">
+                    <span>· e<sup>5t</sup></span>
+                </div>
+            </div>
+
+            <div class="feedback" id="feedback3"></div>
+
+            <div class="controls">
+                <button class="control-btn primary" id="check3" disabled>בדקו תשובה</button>
+                <button class="control-btn show-solution" id="show3" disabled>הציגו פתרון</button>
+            </div>
+
+            <div class="solution-box" id="solution3">
+                <h4>פתרון שלב 3</h4>
+                <div class="solution-step">
+                    <div class="label">המשוואה אחרי הצבה:</div>
+                    <div class="math">z' − 5z = 3te<sup>5t</sup> + 3Be<sup>5t</sup></div>
+                </div>
+                <div class="solution-step">
+                    <div class="label">כפל בגורם אינטגרציה e<sup>−5t</sup>:</div>
+                    <div class="math">
+                        (e<sup>−5t</sup>z)' = 3t + 3B
+                    </div>
+                </div>
+                <div class="solution-step">
+                    <div class="label">אינטגרציה:</div>
+                    <div class="math">
+                        e<sup>−5t</sup>z = (3/2)t² + 3Bt + C
+                    </div>
+                </div>
+                <div class="result-highlight">
+                    <h4>הפתרון</h4>
+                    <div class="math">
+                        <span class="hl-green">z(t) = (3/2)t²e<sup>5t</sup> + 3Bte<sup>5t</sup> + Ce<sup>5t</sup></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Final Answer -->
+            <div class="solution-box" id="final-answer" style="display: none;">
+                <h4>הפתרון הכללי של המערכת</h4>
+                <div class="result-highlight" style="background: rgba(17, 168, 160, 0.15); border-color: var(--teal);">
+                    <div class="math" style="font-size: 1rem; line-height: 2;">
+                        x(t) = t²e<sup>5t</sup> + 2Bte<sup>5t</sup> + Ae<sup>5t</sup><br>
+                        y(t) = te<sup>5t</sup> + Be<sup>5t</sup><br>
+                        z(t) = (3/2)t²e<sup>5t</sup> + 3Bte<sup>5t</sup> + Ce<sup>5t</sup>
+                    </div>
+                    <p style="margin-top: 10px; font-size: 1rem; color: var(--ink); opacity: 0.8;">
+                        כאשר A, B, C קבועים שרירותיים
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav-buttons">
+        <button class="nav-btn" id="prevBtn" disabled>שלב קודם →</button>
+        <button class="nav-btn" id="nextBtn">← שלב הבא</button>
+    </div>
+
+    <script>
+        // State
+        let currentStep = 1;
+        const totalSteps = 3;
+        let stepCompleted = [false, false, false];
+
+        // DOM elements
+        const phases = document.querySelectorAll('.phase');
+        const progressSteps = document.querySelectorAll('.progress-step');
+        const connectors = document.querySelectorAll('.progress-connector');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+
+        // Update UI based on current step
+        function updateUI() {
+            phases.forEach((phase, index) => {
+                if (index + 1 === currentStep) {
+                    phase.classList.add('active');
+                } else {
+                    phase.classList.remove('active');
+                }
+            });
+
+            progressSteps.forEach((step, index) => {
+                step.classList.remove('active', 'completed');
+                if (index + 1 === currentStep) {
+                    step.classList.add('active');
+                } else if (stepCompleted[index]) {
+                    step.classList.add('completed');
+                }
+            });
+
+            connectors.forEach((conn, index) => {
+                if (stepCompleted[index]) {
+                    conn.classList.add('completed');
+                } else {
+                    conn.classList.remove('completed');
+                }
+            });
+
+            prevBtn.disabled = currentStep === 1;
+            nextBtn.disabled = currentStep === totalSteps;
+
+            // Enable/disable buttons based on previous step completion
+            document.getElementById('check2').disabled = !stepCompleted[0];
+            document.getElementById('show2').disabled = !stepCompleted[0];
+            document.getElementById('check3').disabled = !stepCompleted[1];
+            document.getElementById('show3').disabled = !stepCompleted[1];
+        }
+
+        // Show feedback
+        function showFeedback(element, message, isSuccess) {
+            element.textContent = message;
+            element.className = 'feedback visible ' + (isSuccess ? 'success' : 'error');
+        }
+
+        // Normalize answer for comparison
+        function normalize(str) {
+            if (!str) return '';
+            return str.toLowerCase()
+                .replace(/\s+/g, '')
+                .replace(/\*/g, '')
+                .replace(/\^/g, '')
+                .replace(/²/g, '2');
+        }
+
+        // Check Step 1 (y solution)
+        document.getElementById('check1').addEventListener('click', () => {
+            const coef1 = normalize(document.getElementById('y-coef1').value);
+            const coef2 = normalize(document.getElementById('y-coef2').value);
+
+            // Accept: t and B (or b)
+            const coef1Correct = coef1 === 't';
+            const coef2Correct = coef2 === 'b';
+
+            document.getElementById('y-coef1').className = coef1Correct ? 'wide correct' : 'wide incorrect';
+            document.getElementById('y-coef2').className = coef2Correct ? 'correct' : 'incorrect';
+
+            if (coef1Correct && coef2Correct) {
+                showFeedback(document.getElementById('feedback1'), '✓ מצוין! הפתרון נכון', true);
+                stepCompleted[0] = true;
+                updateUI();
+            } else {
+                showFeedback(document.getElementById('feedback1'), '✗ בדקו שוב את האינטגרציה', false);
+            }
+        });
+
+        // Show Step 1 solution
+        document.getElementById('show1').addEventListener('click', () => {
+            document.getElementById('solution1').classList.add('visible');
+            stepCompleted[0] = true;
+            updateUI();
+        });
+
+        // Check Step 2 (x solution)
+        document.getElementById('check2').addEventListener('click', () => {
+            const coef1 = normalize(document.getElementById('x-coef1').value);
+            const coef2 = normalize(document.getElementById('x-coef2').value);
+            const coef3 = normalize(document.getElementById('x-coef3').value);
+
+            // Accept: t^2 or t2, 2Bt or 2bt, A or a
+            const coef1Correct = coef1 === 't2' || coef1 === 't^2';
+            const coef2Correct = coef2 === '2bt' || coef2 === '2tb';
+            const coef3Correct = coef3 === 'a';
+
+            document.getElementById('x-coef1').className = 'wide ' + (coef1Correct ? 'correct' : 'incorrect');
+            document.getElementById('x-coef2').className = 'wide ' + (coef2Correct ? 'correct' : 'incorrect');
+            document.getElementById('x-coef3').className = coef3Correct ? 'correct' : 'incorrect';
+
+            if (coef1Correct && coef2Correct && coef3Correct) {
+                showFeedback(document.getElementById('feedback2'), '✓ מצוין! הפתרון נכון', true);
+                stepCompleted[1] = true;
+                updateUI();
+            } else {
+                showFeedback(document.getElementById('feedback2'), '✗ בדקו שוב את האינטגרציה', false);
+            }
+        });
+
+        // Show Step 2 solution
+        document.getElementById('show2').addEventListener('click', () => {
+            document.getElementById('solution2').classList.add('visible');
+            stepCompleted[1] = true;
+            updateUI();
+        });
+
+        // Check Step 3 (z solution)
+        document.getElementById('check3').addEventListener('click', () => {
+            const coef1 = normalize(document.getElementById('z-coef1').value);
+            const coef2 = normalize(document.getElementById('z-coef2').value);
+            const coef3 = normalize(document.getElementById('z-coef3').value);
+
+            // Accept: 3/2t^2 or 1.5t^2 or (3/2)t2, 3Bt, C
+            const coef1Correct = coef1 === '3/2t2' || coef1 === '(3/2)t2' || coef1 === '1.5t2' || coef1 === '3t2/2';
+            const coef2Correct = coef2 === '3bt' || coef2 === '3tb';
+            const coef3Correct = coef3 === 'c';
+
+            document.getElementById('z-coef1').className = 'wide ' + (coef1Correct ? 'correct' : 'incorrect');
+            document.getElementById('z-coef2').className = 'wide ' + (coef2Correct ? 'correct' : 'incorrect');
+            document.getElementById('z-coef3').className = coef3Correct ? 'correct' : 'incorrect';
+
+            if (coef1Correct && coef2Correct && coef3Correct) {
+                showFeedback(document.getElementById('feedback3'), '✓ מעולה! פתרתם את המערכת בהצלחה!', true);
+                stepCompleted[2] = true;
+                document.getElementById('final-answer').style.display = 'block';
+                updateUI();
+            } else {
+                showFeedback(document.getElementById('feedback3'), '✗ בדקו שוב - שימו לב למקדם 3', false);
+            }
+        });
+
+        // Show Step 3 solution
+        document.getElementById('show3').addEventListener('click', () => {
+            document.getElementById('solution3').classList.add('visible');
+            document.getElementById('final-answer').style.display = 'block';
+            stepCompleted[2] = true;
+            updateUI();
+        });
+
+        // Navigation
+        prevBtn.addEventListener('click', () => {
+            if (currentStep > 1) {
+                currentStep--;
+                updateUI();
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                updateUI();
+            }
+        });
+
+        // Initialize
+        updateUI();
+    </script>
+
+<footer class="site-footer" dir="ltr">
+  &copy; The Open University of Israel | Developed by Shir Sivroni
+</footer>
+</body>
+</html>
