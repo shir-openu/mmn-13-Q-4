@@ -747,6 +747,11 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Inline navigation for Moodle embedding -->
+            <div class="inline-nav" style="text-align: center; margin-top: 20px;">
+                <button class="nav-btn" onclick="showStep(2)">← שלב הבא</button>
+            </div>
         </div>
 
         <!-- Step 2: Solve for x(t) -->
@@ -921,6 +926,11 @@
                         כאשר A, B, C קבועים שרירותיים
                     </p>
                 </div>
+            </div>
+
+            <!-- Inline navigation for Moodle embedding -->
+            <div class="inline-nav" style="text-align: center; margin-top: 20px;">
+                <button class="nav-btn" onclick="showStep(2)">שלב קודם →</button>
             </div>
         </div>
     </div>
@@ -1244,6 +1254,14 @@
                 updateUI();
             }
         });
+
+        // Function for inline navigation buttons (Moodle embedding)
+        function showStep(step) {
+            if (step >= 1 && step <= totalSteps) {
+                currentStep = step;
+                updateUI();
+            }
+        }
 
         // Initialize
         updateUI();
