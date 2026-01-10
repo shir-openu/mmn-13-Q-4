@@ -941,12 +941,6 @@
         </div>
     </div>
 
-    <!-- Navigation -->
-    <div class="nav-buttons">
-        <button class="nav-btn" id="prevBtn" disabled>שלב קודם →</button>
-        <button class="nav-btn" id="nextBtn">← שלב הבא</button>
-    </div>
-
     <script>
         // API Endpoint - Vercel serverless function
         const API_ENDPOINT = 'https://mmn-13-q-4.vercel.app/api/ai-hint';
@@ -983,8 +977,6 @@
         const phases = document.querySelectorAll('.phase');
         const progressSteps = document.querySelectorAll('.progress-step');
         const connectors = document.querySelectorAll('.progress-connector');
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
 
         // Update UI based on current step
         function updateUI() {
@@ -1012,9 +1004,6 @@
                     conn.classList.remove('completed');
                 }
             });
-
-            prevBtn.disabled = currentStep === 1;
-            nextBtn.disabled = currentStep === totalSteps;
 
             // Enable/disable buttons based on previous step completion
             document.getElementById('check2').disabled = !stepCompleted[0];
@@ -1246,22 +1235,7 @@
         // DF Button Step 3
         document.getElementById('df3').addEventListener('click', () => askDigitalFriend(3));
 
-        // Navigation
-        prevBtn.addEventListener('click', () => {
-            if (currentStep > 1) {
-                currentStep--;
-                updateUI();
-            }
-        });
-
-        nextBtn.addEventListener('click', () => {
-            if (currentStep < totalSteps) {
-                currentStep++;
-                updateUI();
-            }
-        });
-
-        // Function for inline navigation buttons (Moodle embedding)
+        // Function for inline navigation buttons
         function showStep(step) {
             if (step >= 1 && step <= totalSteps) {
                 currentStep = step;
