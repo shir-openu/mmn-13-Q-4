@@ -41,7 +41,7 @@ mmn-13-Q-4/
 
 ### Testing the Digital Friend
 1. Enter values in the input fields
-2. Click the "Digital Friend" button (🤔)
+2. Click the "Digital Friend" button (🧐)
 3. The AI will analyze your answer and provide guidance
 
 ## Deployment to Vercel

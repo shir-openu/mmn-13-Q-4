@@ -201,6 +201,6 @@ const server = http.createServer(async (req, res) => {
 server.listen(PORT, () => {
   console.log(`\n🚀 Server running at http://localhost:${PORT}`);
   console.log(`\n📝 Open this URL in your browser to test the exercise`);
-  console.log(`\n🤔 Click "Digital Friend" to test the AI assistant`);
+  console.log(`\n🧐 Click "Digital Friend" to test the AI assistant`);
   console.log(`\n   Press Ctrl+C to stop the server\n`);
 });
