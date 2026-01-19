@@ -136,7 +136,10 @@ ${conversationText ? `## Previous Conversation:\n${conversationText}` : ''}
   } catch (error) {
     console.error('Gemini API Error:', error);
     return res.status(500).json({
-      error: 'שגיאה בעיבוד הבקשה. נסו שוב.'
+      error: 'שגיאה בעיבוד הבקשה. נסו שוב.',
+      debug: error.message,
+      hasKey: !!process.env.GOOGLE_API_KEY,
+      keyPrefix: process.env.GOOGLE_API_KEY?.substring(0, 10)
     });
   }
 }
