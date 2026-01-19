@@ -3,6 +3,9 @@
 .env.local
 .env.*.local
 
+# Local documentation (contains sensitive info - never commit!)
+CLAUDE_SUMMARY.txt
+
 # Dependencies
 node_modules/
 
