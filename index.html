@@ -1157,11 +1157,13 @@
             }
         });
 
-        // Show Step 1 solution
+        // Show/Hide Step 1 solution (toggle)
         document.getElementById('show1').addEventListener('click', () => {
-            document.getElementById('solution1').classList.add('visible');
-            stepCompleted[0] = true;
-            updateUI();
+            document.getElementById('solution1').classList.toggle('visible');
+            if (document.getElementById('solution1').classList.contains('visible')) {
+                stepCompleted[0] = true;
+                updateUI();
+            }
         });
 
         // DF Button Step 1
@@ -1190,11 +1192,13 @@
             }
         });
 
-        // Show Step 2 solution
+        // Show/Hide Step 2 solution (toggle)
         document.getElementById('show2').addEventListener('click', () => {
-            document.getElementById('solution2').classList.add('visible');
-            stepCompleted[1] = true;
-            updateUI();
+            document.getElementById('solution2').classList.toggle('visible');
+            if (document.getElementById('solution2').classList.contains('visible')) {
+                stepCompleted[1] = true;
+                updateUI();
+            }
         });
 
         // DF Button Step 2
@@ -1224,12 +1228,15 @@
             }
         });
 
-        // Show Step 3 solution
+        // Show/Hide Step 3 solution (toggle)
         document.getElementById('show3').addEventListener('click', () => {
-            document.getElementById('solution3').classList.add('visible');
-            document.getElementById('final-answer').style.display = 'block';
-            stepCompleted[2] = true;
-            updateUI();
+            document.getElementById('solution3').classList.toggle('visible');
+            const isVisible = document.getElementById('solution3').classList.contains('visible');
+            document.getElementById('final-answer').style.display = isVisible ? 'block' : 'none';
+            if (isVisible) {
+                stepCompleted[2] = true;
+                updateUI();
+            }
         });
 
         // DF Button Step 3

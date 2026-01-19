@@ -132,6 +132,7 @@ ${conversationText ? `## Previous Conversation:\n${conversationText}` : ''}
 
 # YOUR RESPONSE:
 1. If CORRECT: "נכון! [brief confirmation]" and encourage next step
+   - Accept any mathematically equivalent form of the correct answer
 2. If INCORRECT: Identify the specific error and give the appropriate hint from above
 3. If student asks for help/hint: Give the next hint in progression
 4. After 3+ attempts: Give more explicit guidance, show intermediate steps
