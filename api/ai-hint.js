@@ -56,6 +56,7 @@ const prompt = `
 5. NEVER give the complete final answer until ${MAX_ATTEMPTS} attempts exhausted
 6. NEVER repeat the same hint - check conversation history and progress
 7. NEVER put quotes around equations - write them directly without '' or "" marks
+8. ACCEPT ANY MATHEMATICALLY EQUIVALENT FORM of the correct answer
 
 ---
 
