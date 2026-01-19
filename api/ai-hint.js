@@ -4,17 +4,8 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 const MAX_ATTEMPTS = 10;
 
 export default async function handler(req, res) {
-  // CORS headers - allow local development and future GitHub Pages
-  const allowedOrigins = [
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
-    'https://shir-openu.github.io'
-  ];
-
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  }
+  // CORS headers - simple approach matching DF_7 for reliability
+  res.setHeader('Access-Control-Allow-Origin', 'https://shir-openu.github.io');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
