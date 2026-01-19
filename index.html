@@ -788,9 +788,9 @@
             <div class="feedback" id="feedback2"></div>
 
             <div class="controls">
-                <button class="control-btn primary" id="check2" disabled>בדקו תשובה</button>
-                <button class="control-btn show-solution" id="show2" disabled>הציגו פתרון</button>
-                <button class="df-btn" id="df2" disabled>
+                <button class="control-btn primary" id="check2">בדקו תשובה</button>
+                <button class="control-btn show-solution" id="show2">הציגו פתרון</button>
+                <button class="df-btn" id="df2">
                     <span class="df-icon">🧐</span>
                     <span>Digital Friend</span>
                 </button>
@@ -873,9 +873,9 @@
             <div class="feedback" id="feedback3"></div>
 
             <div class="controls">
-                <button class="control-btn primary" id="check3" disabled>בדקו תשובה</button>
-                <button class="control-btn show-solution" id="show3" disabled>הציגו פתרון</button>
-                <button class="df-btn" id="df3" disabled>
+                <button class="control-btn primary" id="check3">בדקו תשובה</button>
+                <button class="control-btn show-solution" id="show3">הציגו פתרון</button>
+                <button class="df-btn" id="df3">
                     <span class="df-icon">🧐</span>
                     <span>Digital Friend</span>
                 </button>
@@ -1006,12 +1006,7 @@
             });
 
             // Enable/disable buttons based on previous step completion
-            document.getElementById('check2').disabled = !stepCompleted[0];
-            document.getElementById('show2').disabled = !stepCompleted[0];
-            document.getElementById('df2').disabled = !stepCompleted[0];
-            document.getElementById('check3').disabled = !stepCompleted[1];
-            document.getElementById('show3').disabled = !stepCompleted[1];
-            document.getElementById('df3').disabled = !stepCompleted[1];
+            // All stages are accessible - no restrictions based on previous step completion
         }
 
         // Show feedback
