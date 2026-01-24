@@ -22,6 +22,9 @@ Thumbs.db
 *.swp
 *.swo
 
+# Claude Code CLI
+.claude/
+
 # Local files (not for GitHub)
 *.pdf
 *.jpg
