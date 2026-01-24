@@ -28,3 +28,11 @@ Thumbs.db
 *.png
 *.txt
 !README.txt
+
+# Microsoft Office files
+*.docx
+*.doc
+*.xlsx
+*.xls
+*.pptx
+*.ppt
