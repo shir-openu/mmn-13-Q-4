@@ -3,6 +3,39 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const MAX_ATTEMPTS = 10;
 
+// Helper function to call OpenRouter API
+async function callOpenRouter(prompt) {
+  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      model: 'deepseek/deepseek-r1',
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`OpenRouter API error: ${response.status} ${errorText}`);
+  }
+
+  const data = await response.json();
+  return data.choices[0].message.content;
+}
+
+// Helper function to call Google Gemini API
+async function callGemini(prompt) {
+  const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+
+  const result = await model.generateContent(prompt);
+  const response = await result.response;
+  return response.text();
+}
+
 export default async function handler(req, res) {
   // CORS headers - simple approach matching DF_7 for reliability
   res.setHeader('Access-Control-Allow-Origin', 'https://shir-openu.github.io');
@@ -27,8 +60,8 @@ export default async function handler(req, res) {
   }
 
   try {
-    const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    // Determine which AI provider to use
+    const aiProvider = process.env.AI_PROVIDER || 'google';
 
     // Build conversation history text
     let conversationText = '';
@@ -127,17 +160,24 @@ ${conversationText ? `## Previous Conversation:\n${conversationText}` : ''}
 4. After 3+ attempts: Give more explicit guidance, show intermediate steps
 `;
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const hint = response.text();
+    // Call the appropriate AI provider
+    let hint;
+    if (aiProvider === 'openrouter') {
+      hint = await callOpenRouter(prompt);
+    } else {
+      // Default to Google Gemini
+      hint = await callGemini(prompt);
+    }
 
-    return res.status(200).json({ hint });
+    return res.status(200).json({ hint, provider: aiProvider });
 
   } catch (error) {
-    console.error('Gemini API Error:', error);
+    console.error('AI API Error:', error);
+    const aiProvider = process.env.AI_PROVIDER || 'google';
     return res.status(500).json({
       error: 'שגיאה בעיבוד הבקשה. נסו שוב.',
-      keyPrefix: process.env.GOOGLE_API_KEY?.substring(0, 15)
+      provider: aiProvider,
+      details: error.message
     });
   }
 }

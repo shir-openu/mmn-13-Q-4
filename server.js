@@ -28,6 +28,39 @@ const mimeTypes = {
   '.ico': 'image/x-icon'
 };
 
+// Helper function to call OpenRouter API
+async function callOpenRouter(prompt) {
+  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      model: 'deepseek/deepseek-r1',
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`OpenRouter API error: ${response.status} ${errorText}`);
+  }
+
+  const data = await response.json();
+  return data.choices[0].message.content;
+}
+
+// Helper function to call Google Gemini API
+async function callGemini(prompt) {
+  const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+
+  const result = await model.generateContent(prompt);
+  const response = await result.response;
+  return response.text();
+}
+
 // AI Handler function
 async function handleAIRequest(body) {
   const { userInput, currentStep, problemData, conversationHistory } = body;
@@ -39,8 +72,8 @@ async function handleAIRequest(body) {
     };
   }
 
-  const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+  // Determine which AI provider to use
+  const aiProvider = process.env.AI_PROVIDER || 'google';
 
   // Build conversation history text
   let conversationText = '';
@@ -139,11 +172,16 @@ ${conversationText ? `## Previous Conversation:\n${conversationText}` : ''}
 4. After 3+ attempts: Give more explicit guidance, show intermediate steps
 `;
 
-  const result = await model.generateContent(prompt);
-  const response = await result.response;
-  const hint = response.text();
+  // Call the appropriate AI provider
+  let hint;
+  if (aiProvider === 'openrouter') {
+    hint = await callOpenRouter(prompt);
+  } else {
+    // Default to Google Gemini
+    hint = await callGemini(prompt);
+  }
 
-  return { hint };
+  return { hint, provider: aiProvider };
 }
 
 // Create server
@@ -170,9 +208,14 @@ const server = http.createServer(async (req, res) => {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(result));
       } catch (error) {
-        console.error('API Error:', error);
+        console.error('AI API Error:', error);
+        const aiProvider = process.env.AI_PROVIDER || 'google';
         res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'שגיאה בעיבוד הבקשה: ' + error.message }));
+        res.end(JSON.stringify({
+          error: 'שגיאה בעיבוד הבקשה. נסו שוב.',
+          provider: aiProvider,
+          details: error.message
+        }));
       }
     });
     return;
@@ -202,7 +245,11 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, () => {
+  const aiProvider = process.env.AI_PROVIDER || 'google';
+  const providerName = aiProvider === 'openrouter' ? 'OpenRouter DeepSeek-R1' : 'Google Gemini 2.5 Flash';
+
   console.log(`\n🚀 Server running at http://localhost:${PORT}`);
+  console.log(`\n🤖 AI Provider: ${providerName}`);
   console.log(`\n📝 Open this URL in your browser to test the exercise`);
   console.log(`\n🧐 Click "Digital Friend" to test the AI assistant`);
   console.log(`\n   Press Ctrl+C to stop the server\n`);
