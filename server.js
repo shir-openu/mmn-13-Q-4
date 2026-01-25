@@ -37,7 +37,7 @@ async function callOpenRouter(prompt) {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      model: 'deepseek/deepseek-r1',
+      model: 'anthropic/claude-3.5-haiku',
       messages: [{ role: 'user', content: prompt }]
     })
   });
@@ -255,7 +255,7 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, () => {
   const aiProvider = process.env.AI_PROVIDER || 'google';
-  const providerName = aiProvider === 'openrouter' ? 'OpenRouter DeepSeek-R1' : 'Google Gemini 2.5 Flash';
+  const providerName = aiProvider === 'openrouter' ? 'OpenRouter Claude 3.5 Haiku' : 'Google Gemini 2.5 Flash';
 
   console.log(`\n🚀 Server running at http://localhost:${PORT}`);
   console.log(`\n🤖 AI Provider: ${providerName}`);

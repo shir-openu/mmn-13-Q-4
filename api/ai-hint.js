@@ -12,7 +12,7 @@ async function callOpenRouter(prompt) {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      model: 'deepseek/deepseek-r1',
+      model: 'anthropic/claude-3.5-haiku',
       messages: [{ role: 'user', content: prompt }]
     })
   });
