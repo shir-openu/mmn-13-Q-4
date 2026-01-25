@@ -94,6 +94,15 @@ async function handleAIRequest(body) {
 7. NEVER put quotes around equations - write them directly without '' or "" marks
 8. ACCEPT ANY MATHEMATICALLY EQUIVALENT FORM of the correct answer
 
+# MATHEMATICAL EQUIVALENCE FOR DIFFERENTIAL EQUATIONS
+When comparing student answers to the expected solution:
+- Arbitrary constants (A, B, C, etc.) are ARBITRARY by definition
+- Different constant names represent the same family of solutions
+- Constant coefficients are irrelevant (constants can absorb any scalar multiple)
+- What matters is the FUNCTIONAL FORM (exponentials, polynomials, structure)
+- If the student's solution represents the same family of functions, it is CORRECT
+- Focus on whether the solution satisfies the differential equation, not constant notation
+
 ---
 
 # The Exercise: Triangular ODE System - Substitution Method
